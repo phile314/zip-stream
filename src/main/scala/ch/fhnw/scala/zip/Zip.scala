@@ -123,8 +123,8 @@ class Zip[M[_]] {
   private def endDirectory(entryCount:Int, cdOff: Int, cdLen:Int):Process[M, ByteVector] = {
     Process.suspend {
 
-/*
-      val zip64End = hex"0x06064b50" ++
+
+      val zip64End = hex("0x06064b50") ++
         int8(44) ++
         int2(madeByZipVersion) ++
         int2(requiredZipVersion) ++
@@ -134,10 +134,10 @@ class Zip[M[_]] {
         int8(entryCount.toLong) ++
         int8(cdLen.toLong) ++ // central directory length
         int8(cdOff.toLong)
-      val zip64Locator = hex"0x07064b50" ++
+      val zip64Locator = hex("0x07064b50") ++
         int4(0) ++
         int8(cdOff.toLong + cdLen.toLong) ++
-        int4(1)*/
+        int4(1)
 
       val end = hex("0x06054b50") ++
         int2(0) ++
@@ -148,7 +148,7 @@ class Zip[M[_]] {
         int4(cdOff) ++
         int2(0)
 
-      Process.emit(/*zip64End ++ zip64Locator ++*/ end)
+      Process.emit(zip64End ++ zip64Locator ++ end)
     }
   }
 
@@ -218,8 +218,8 @@ class Zip[M[_]] {
     ByteVector.fromInt(x, 4, ByteOrdering.LittleEndian)
   }
 
-/*  private def int8(x:Long):ByteVector = {
+  private def int8(x:Long):ByteVector = {
     ByteVector.fromLong(x, 8, ByteOrdering.LittleEndian)
-  }*/
+  }
 }
 
