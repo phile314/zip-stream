@@ -123,7 +123,7 @@ class Zip[M[_]] {
   private def endDirectory(entryCount:Int, cdOff: Int, cdLen:Int):Process[M, ByteVector] = {
     Process.suspend {
 
-
+/*
       val zip64End = hex"0x06064b50" ++
         int8(44) ++
         int2(madeByZipVersion) ++
@@ -137,9 +137,9 @@ class Zip[M[_]] {
       val zip64Locator = hex"0x07064b50" ++
         int4(0) ++
         int8(cdOff.toLong + cdLen.toLong) ++
-        int4(1)
+        int4(1)*/
 
-      val end = hex"0x06054b50" ++
+      val end = hex("0x06054b50") ++
         int2(0) ++
         int2(0) ++
         int2(entryCount) ++
@@ -148,7 +148,7 @@ class Zip[M[_]] {
         int4(cdOff) ++
         int2(0)
 
-      Process.emit(zip64End ++ zip64Locator ++ end)
+      Process.emit(/*zip64End ++ zip64Locator ++*/ end)
     }
   }
 
@@ -170,16 +170,16 @@ class Zip[M[_]] {
       // general purpose flags (2B)
       bin"0010000000010000".bytes ++
       // compression method (none) (2B)
-      hex"0000" ++
+      hex("0000") ++
       // last mod (2 + 2B)
       toDOSTime(header.modTime) ++
       // crc32, comp. + uncomp. size (4 + 4 + 4 B)
       // set to zero here, see data descriptor for values
-      hex"0x000000000000" ++
+      hex("0x000000000000") ++
       // filename length (2B)
       int2(nameBytes.length) ++
       // extra field length (2B)
-      hex"0000" ++
+      hex("0000") ++
       // filename
       ByteVector(nameBytes) ++
       // extra field
@@ -206,6 +206,9 @@ class Zip[M[_]] {
     (time ++ date).bytes
   }
 
+  private def hex(s:String):ByteVector = {
+    ByteVector.fromValidHex(s).reverse
+  }
 
   private def int2(x:Int):ByteVector = {
     ByteVector.fromInt(x, 2, ByteOrdering.LittleEndian)
@@ -215,8 +218,8 @@ class Zip[M[_]] {
     ByteVector.fromInt(x, 4, ByteOrdering.LittleEndian)
   }
 
-  private def int8(x:Long):ByteVector = {
+/*  private def int8(x:Long):ByteVector = {
     ByteVector.fromLong(x, 8, ByteOrdering.LittleEndian)
-  }
+  }*/
 }
 
