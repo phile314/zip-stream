@@ -46,19 +46,19 @@ class Zip[M[_]] {
         data match {
           case ZipDataByteVector(bytes) => {
             val crc32 = crc.crc32(bytes.bits).bytes
-            entryDictionary = centralDirectoryEntry(header, entryOffset, crc32, bytes.size.toInt) :: entryDictionary
+            entryDictionary = centralDirectoryEntry(header, entryOffset, crc32, bytes.size) :: entryDictionary
             localFileHeader(header) ++ Process.suspend{
-              offset += bytes.length.toInt
+              offset += bytes.length
               Process.emit(bytes)
-            } ++ dataDescriptor(bytes.size.toInt, crc32)
+            } ++ dataDescriptor(bytes.size, crc32)
           }
           case ZipDataSource(p) => {
             var size = 0;
             val crc32 = new CRC32()
             val digest = new Function[ByteVector, ByteVector] {
               override def apply (v1: ByteVector): ByteVector = {
-                offset += v1.length.toInt
-                size += v1.length.toInt
+                offset += v1.length
+                size += v1.length
                 crc32.update(v1.toArray)
                 v1
               }
@@ -71,7 +71,7 @@ class Zip[M[_]] {
           }
         }
       }
-    } onComplete(centralDirectory(entryDictionary))
+    } onComplete(centralDirectory(entryDictionary.reverse))
   }
 
   private def centralDirectoryEntry(header: ZipEntryHeader, localHeaderOffset: Int, crc:ByteVector, size:Int):ByteVector = {
@@ -84,21 +84,21 @@ class Zip[M[_]] {
 
 
 
-    hex"0x02014b50" ++
-      int4(madeByZipVersion) ++
-      int4(requiredZipVersion) ++
-      bin"0010000000010000".bytes ++
-      hex"0000" ++
+    hex("0x02014b50") ++
+      int2(madeByZipVersion) ++
+      int2(requiredZipVersion) ++
+      bin("0010000000010000") ++
+      hex("0000") ++
       toDOSTime(header.modTime) ++
       crc ++
       int4(size) ++
       int4(size) ++
       int2(nameBytes.length) ++
-      int2(4 + 164) ++
+      int2(0) ++
       int2(0) ++ // comment length
       int2(0) ++ // disk number
       int2(0) ++ // internal file attributes
-      int2(0) ++ //external file attributes
+      int4(0) ++ //external file attributes
       int4(localHeaderOffset) ++
       ByteVector(nameBytes)
       //zip64Extra
@@ -156,7 +156,7 @@ class Zip[M[_]] {
     val result = crc32 ++ int4(size) ++ int4(size)
 
     Process.suspend {
-      offset += result.length.toInt
+      offset += result.length
       Process.emit(result)
     }
   }
@@ -164,18 +164,19 @@ class Zip[M[_]] {
   private def localFileHeader(header: ZipEntryHeader):Process[M, ByteVector] = {
     val nameBytes = header.name.getBytes(Charset.forName("UTF-8"));
       // signature (4B)
-    val result = hex"0x04034b50" ++
+    val result = hex("0x04034b50") ++
       // version needed (2B)
       int2(requiredZipVersion) ++
       // general purpose flags (2B)
-      bin"0010000000010000".bytes ++
+      bin("0010000000010000") ++
       // compression method (none) (2B)
       hex("0000") ++
       // last mod (2 + 2B)
       toDOSTime(header.modTime) ++
       // crc32, comp. + uncomp. size (4 + 4 + 4 B)
       // set to zero here, see data descriptor for values
-      hex("0x000000000000") ++
+      ByteVector.fill(12)(0) ++
+//      hex("0x000000000000") ++
       // filename length (2B)
       int2(nameBytes.length) ++
       // extra field length (2B)
@@ -204,6 +205,10 @@ class Zip[M[_]] {
         BitVector.fromInt(dt.getMonthOfYear, 4, ByteOrdering.LittleEndian) ++
         BitVector.fromInt(dt.getDayOfMonth, 5, ByteOrdering.LittleEndian)
     (time ++ date).bytes
+  }
+
+  private def bin(s:String):ByteVector = {
+    ByteVector.fromValidBin(s).reverse
   }
 
   private def hex(s:String):ByteVector = {
