@@ -45,7 +45,7 @@ class Zip[M[_]] {
         val entryOffset = offset
         data match {
           case ZipDataByteVector(bytes) => {
-            val crc32 = crc.crc32(bytes.bits).bytes
+            val crc32 = crc.crc32(bytes.bits).bytes.reverse
             entryDictionary = centralDirectoryEntry(header, entryOffset, crc32, bytes.size) :: entryDictionary
             localFileHeader(header) ++ Process.suspend{
               offset += bytes.length
@@ -87,7 +87,7 @@ class Zip[M[_]] {
     hex("0x02014b50") ++
       int2(madeByZipVersion) ++
       int2(requiredZipVersion) ++
-      bin("0010000000010000") ++
+      bin("0000100000001000") ++
       hex("0000") ++
       toDOSTime(header.modTime) ++
       crc ++
@@ -168,7 +168,7 @@ class Zip[M[_]] {
       // version needed (2B)
       int2(requiredZipVersion) ++
       // general purpose flags (2B)
-      bin("0010000000010000") ++
+      bin("0000100000001000") ++
       // compression method (none) (2B)
       hex("0000") ++
       // last mod (2 + 2B)
