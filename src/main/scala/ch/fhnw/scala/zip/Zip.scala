@@ -46,19 +46,19 @@ class Zip[M[_]] {
         data match {
           case ZipDataByteVector(bytes) => {
             val crc32 = crc.crc32(bytes.bits).bytes.reverse
-            entryDictionary = centralDirectoryEntry(header, entryOffset, crc32, bytes.size) :: entryDictionary
+            entryDictionary = centralDirectoryEntry(header, entryOffset, crc32, bytes.size.toInt) :: entryDictionary
             localFileHeader(header) ++ Process.suspend{
-              offset += bytes.length
+              offset += bytes.length.toInt
               Process.emit(bytes)
-            } ++ dataDescriptor(bytes.size, crc32)
+            } ++ dataDescriptor(bytes.size.toInt, crc32)
           }
           case ZipDataSource(p) => {
             var size = 0;
             val crc32 = new CRC32()
             val digest = new Function[ByteVector, ByteVector] {
               override def apply (v1: ByteVector): ByteVector = {
-                offset += v1.length
-                size += v1.length
+                offset += v1.length.toInt
+                size += v1.length.toInt
                 crc32.update(v1.toArray)
                 v1
               }
@@ -156,7 +156,7 @@ class Zip[M[_]] {
     val result = crc32 ++ int4(size) ++ int4(size)
 
     Process.suspend {
-      offset += result.length
+      offset += result.length.toInt
       Process.emit(result)
     }
   }

@@ -9,10 +9,10 @@ scalaVersion := "2.11.8"
 libraryDependencies ++= Seq(
   "com.github.nscala-time" %% "nscala-time" % "2.14.0",
   "joda-time" % "joda-time" % "2.9.4",
-  "org.scodec" %% "scodec-core" % "1.8.3",
-  "org.scodec" %% "scodec-bits" % "1.0.12",
-  "org.scalaz" %% "scalaz-core" % "7.2.0",
-  "org.scalaz.stream" %% "scalaz-stream" % "0.8a"
+  "org.scodec" %% "scodec-core" % "1.10.3",
+  "org.scodec" %% "scodec-bits" % "1.1.2",
+  "org.scalaz" %% "scalaz-core" % "7.2.6",
+  "org.scalaz.stream" %% "scalaz-stream" % "0.8.5a"
 /*
 "org.log4s" %% "log4s" % "1.3.3",
   compilerPlugin("org.spire-math" %% "kind-projector" % "0.8.2"),
