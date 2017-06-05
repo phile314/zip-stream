@@ -2,17 +2,19 @@ package ch.fhnw.scala.zip
 
 
 import java.nio.charset.Charset
-import java.security.MessageDigest
 import java.util.zip.CRC32
 
 import com.github.nscala_time.time.Imports._
-import org.joda.time.Chronology
 import scodec.bits._
 
 import scalaz._
 import scalaz.stream._
 
 object Zip {
+
+  case class ZipOptions()
+  val DefaultOptions = ZipOptions()
+
   case class ZipEntry[M[_]](header: ZipEntryHeader, data: ZipData[M])
 
   case class ZipEntryHeader(name: String, modTime: DateTime, size: Option[Long])
@@ -21,9 +23,17 @@ object Zip {
 
   case class ZipDataByteVector[M[_]](bytes: ByteVector) extends ZipData[M]
 
+  /**
+    * Read the file content from the given process.
+    */
   case class ZipDataSource[M[_]](process: Process[M, ByteVector]) extends ZipData[M]
 
-  def encode[M[_]](in: Process[M, ZipEntry[M]]): Process[M, ByteVector] = {
+  /**
+    * Encode the zip entries as byte vectors.
+    * @param in The zip entry source.
+    * @tparam M The effect monad.
+    */
+  def encode[M[_]](in: Process[M, ZipEntry[M]], options: ZipOptions = DefaultOptions): Process[M, ByteVector] = {
     new Zip[M]().encode(in)
   }
 
@@ -122,8 +132,6 @@ class Zip[M[_]] {
 
   private def endDirectory(entryCount:Int, cdOff: Int, cdLen:Int):Process[M, ByteVector] = {
     Process.suspend {
-
-
       val zip64End = hex("0x06064b50") ++
         int8(44) ++
         int2(madeByZipVersion) ++
@@ -154,7 +162,6 @@ class Zip[M[_]] {
 
   private def dataDescriptor(size:Int, crc32: ByteVector):Process[M, ByteVector] = {
     val result = crc32 ++ int4(size) ++ int4(size)
-
     Process.suspend {
       offset += result.length.toInt
       Process.emit(result)
@@ -176,7 +183,6 @@ class Zip[M[_]] {
       // crc32, comp. + uncomp. size (4 + 4 + 4 B)
       // set to zero here, see data descriptor for values
       ByteVector.fill(12)(0) ++
-//      hex("0x000000000000") ++
       // filename length (2B)
       int2(nameBytes.length) ++
       // extra field length (2B)
