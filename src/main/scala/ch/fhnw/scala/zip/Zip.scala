@@ -10,6 +10,10 @@ import scodec.bits._
 import scalaz._
 import scalaz.stream._
 
+/**
+  * Creates zip files conforming to the https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT specification.
+  *
+  */
 object Zip {
 
   case class ZipOptions()
@@ -39,7 +43,7 @@ object Zip {
 
 }
 
-class Zip[M[_]] {
+private class Zip[M[_]] {
 
   import Zip._
 
@@ -86,13 +90,6 @@ class Zip[M[_]] {
 
   private def centralDirectoryEntry(header: ZipEntryHeader, localHeaderOffset: Int, crc:ByteVector, size:Int):ByteVector = {
     val nameBytes = header.name.getBytes(Charset.forName("UTF-8"));
-    /*val zip64Extra = hex"0x0001".bits ++
-      int2(32) ++
-      int8(size) ++
-      int8(size) ++
-      int8(localHeaderOffset) ++*/
-
-
 
     hex("0x02014b50") ++
       int2(madeByZipVersion) ++
@@ -111,7 +108,6 @@ class Zip[M[_]] {
       int4(0) ++ //external file attributes
       int4(localHeaderOffset) ++
       ByteVector(nameBytes)
-      //zip64Extra
 
   }
   private def centralDirectory(entries:List[ByteVector]):Process[M, ByteVector] = {
@@ -201,6 +197,7 @@ class Zip[M[_]] {
 
 
   private def toDOSTime(datetime:DateTime):ByteVector = {
+    // See e.g. https://msdn.microsoft.com/en-us/library/windows/desktop/ms724247(v=vs.85).aspx
     val dt = datetime.toDateTime(DateTimeZone.UTC)
     val time =
       BitVector.fromInt(dt.getHourOfDay, 5, ByteOrdering.LittleEndian) ++

@@ -11,17 +11,16 @@ import scodec.bits._
 import scalaz.concurrent.Task
 
 /**
-  * Created by philipp on 5/30/17.
+  * Small test app creating a simple zip file.
   */
 object Main extends App {
     val content: Process[Task, ZipEntry[Task]] = Process.emit(ZipEntry(ZipEntryHeader("Test.txt", DateTime.now(), None), ZipDataByteVector(ByteVector.encodeUtf8("sfasdf").right.get)))
 
     val zipped = Zip.encode(content)
 
-    val sink = fileChunkW("/home/philipp/test.zip")
+    val sink = fileChunkW("test.zip")
 
     zipped.to(sink).run.unsafePerformSync
-    //zipped.run.unsafePerformSync
 
 
 }
