@@ -1,7 +1,7 @@
 # zip-stream
 
 A simple zip streaming library for scalaz-stream. Especially useful for creating zip files on demand,
-e.g. large HTTP downloads.
+e.g. large HTTP downloads. The design is inspired by the Haskell [zip-stream](https://github.com/dylex/zip-stream) library.
 
 ## How to use
 
