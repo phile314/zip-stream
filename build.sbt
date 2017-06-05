@@ -2,7 +2,40 @@ name := "zip-stream"
 
 version := "0.1"
 
-organization := "ISSKA"
+organization := "FHNW i4Ds"
+
+licenses += ("BSD3", url("https://opensource.org/licenses/BSD-3-Clause"))
+
+/*
+homepage := Some(url(""))
+
+scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/your-account/your-project"),
+    "scm:git@github.com:your-account/your-project.git"
+  )
+)
+*/
+
+developers := List(
+  Developer(
+    id    = "phile314",
+    name  = "Philipp Hausmann",
+    email = "philipp.hausmann@fhnw.ch",
+    url   = url("https://github.com/phile314")
+  )
+)
+
+publishMavenStyle := true
+
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+}
+
 
 scalaVersion := "2.11.8"
 
@@ -14,14 +47,9 @@ libraryDependencies ++= Seq(
   "org.scalaz" %% "scalaz-core" % "7.2.6",
   "org.scalaz.stream" %% "scalaz-stream" % "0.8.5a"
 /*
-"org.log4s" %% "log4s" % "1.3.3",
-  compilerPlugin("org.spire-math" %% "kind-projector" % "0.8.2"),
   "org.specs2" %% "specs2-core" % "3.8.5" % "test",
   "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
-  "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.3" % "test",
-  // necessary to shut up some warnings
-  // see https://issues.scala-lang.org/browse/SI-8978
-  "com.google.code.findbugs" % "jsr305" % "3.0.2"*/
+  "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.3" % "test",*/
 )
 
 scalacOptions ++= Seq(
