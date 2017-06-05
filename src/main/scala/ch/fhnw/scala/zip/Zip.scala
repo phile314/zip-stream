@@ -201,10 +201,10 @@ class Zip[M[_]] {
         BitVector.fromInt(dt.getMinuteOfHour, 6, ByteOrdering.LittleEndian) ++
         BitVector.fromInt(dt.getSecondOfMinute / 2, 5, ByteOrdering.LittleEndian)
     val date =
-      BitVector.fromInt(dt.getYear, 7, ByteOrdering.LittleEndian) ++
+      BitVector.fromInt(dt.getYear - 1980, 7, ByteOrdering.LittleEndian) ++
         BitVector.fromInt(dt.getMonthOfYear, 4, ByteOrdering.LittleEndian) ++
         BitVector.fromInt(dt.getDayOfMonth, 5, ByteOrdering.LittleEndian)
-    (time ++ date).bytes
+    (time.bytes.reverse ++ date.bytes.reverse)
   }
 
   private def bin(s:String):ByteVector = {
