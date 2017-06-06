@@ -2,27 +2,27 @@ name := "zip-stream"
 
 version := "0.1"
 
-organization := "FHNW i4Ds"
+organization := "314.ch"
+
+description := "Streaming zip library for scalaz-stream."
 
 licenses += ("BSD3", url("https://opensource.org/licenses/BSD-3-Clause"))
 
-/*
-homepage := Some(url(""))
+homepage := Some(url("https://github.com/phile314/zip-stream"))
 
 scmInfo := Some(
   ScmInfo(
-    url("https://github.com/your-account/your-project"),
-    "scm:git@github.com:your-account/your-project.git"
+    url("https://github.com/phile314/zip-stream"),
+    "scm:git@github.com:phile314/zip-stream.git"
   )
 )
-*/
 
 developers := List(
   Developer(
     id    = "phile314",
     name  = "Philipp Hausmann",
-    email = "philipp.hausmann@fhnw.ch",
-    url   = url("https://github.com/phile314-fh")
+    email = "ph_git@314.ch",
+    url   = url("https://github.com/phile314")
   )
 )
 
