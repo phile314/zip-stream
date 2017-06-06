@@ -2,7 +2,7 @@ name := "zip-stream"
 
 version := "0.1"
 
-organization := "314.ch"
+organization := "ch.314"
 
 description := "Streaming zip library for scalaz-stream."
 
